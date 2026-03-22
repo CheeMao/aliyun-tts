@@ -3,7 +3,7 @@ name: Build Release
 on:
   push:
     tags:
-      - 'v*'  # 推送 v 开头的 tag 时触发，如 v1.0.0
+      - 'v*'
 
 jobs:
   build:
@@ -12,14 +12,11 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            artifact: AI-TTS-Windows
-            ext: .exe
+            name: Windows
           - os: macos-latest
-            artifact: AI-TTS-macOS
-            ext: .app
+            name: macOS
           - os: ubuntu-latest
-            artifact: AI-TTS-Linux
-            ext: ''
+            name: Linux
 
     steps:
       - name: Checkout code
@@ -30,53 +27,26 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+      - name: Install system dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-tk xvfb
+
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install dashscope pyinstaller
 
-      - name: Build executable (Windows)
-        if: matrix.os == 'windows-latest'
+      - name: Build executable
         run: |
           pyinstaller --onefile --windowed --name "AI-TTS" tts_gui.py
 
-      - name: Build executable (macOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          pyinstaller --onefile --windowed --name "AI-TTS" tts_gui.py
-
-      - name: Install system dependencies (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-tk
-        continue-on-error: true
-
-      - name: Build executable (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          pyinstaller --onefile --name "AI-TTS" tts_gui.py
-
-      - name: Upload artifact (Windows)
-        if: matrix.os == 'windows-latest'
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.artifact }}
-          path: dist/AI-TTS.exe
-
-      - name: Upload artifact (macOS)
-        if: matrix.os == 'macos-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.artifact }}
-          path: dist/AI-TTS
-
-      - name: Upload artifact (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.artifact }}
-          path: dist/AI-TTS
+          name: AI-TTS-${{ matrix.name }}
+          path: dist/AI-TTS*
 
   release:
     needs: build
@@ -85,19 +55,29 @@ jobs:
       contents: write
 
     steps:
-      - name: Download all artifacts
+      - name: Download Windows artifact
         uses: actions/download-artifact@v4
         with:
-          path: artifacts
+          name: AI-TTS-Windows
+          path: release/
 
-      - name: Display structure of downloaded files
-        run: ls -R artifacts
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: AI-TTS-macOS
+          path: release/
+
+      - name: Download Linux artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: AI-TTS-Linux
+          path: release/
+
+      - name: List release files
+        run: ls -la release/
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            artifacts/AI-TTS-Windows/*
-            artifacts/AI-TTS-macOS/*
-            artifacts/AI-TTS-Linux/*
+          files: release/*
           generate_release_notes: true
