@@ -116,8 +116,30 @@ class TTSGui:
         )
         voice_combo.grid(row=2, column=1, sticky=tk.W, pady=(10, 0))
 
+        # 语速
+        ttk.Label(config_frame, text="语速:").grid(row=3, column=0, sticky=tk.W, padx=(0, 10), pady=(10, 0))
+        speech_rate_frame = ttk.Frame(config_frame)
+        speech_rate_frame.grid(row=3, column=1, sticky=tk.W, pady=(10, 0))
+
+        self.speech_rate_var = tk.DoubleVar(value=self.config.get("speech_rate", 1.0))
+        self.speech_rate_scale = ttk.Scale(
+            speech_rate_frame,
+            from_=0.5,
+            to=2.0,
+            variable=self.speech_rate_var,
+            orient=tk.HORIZONTAL,
+            length=200,
+            command=self.update_speech_rate_label
+        )
+        self.speech_rate_scale.pack(side=tk.LEFT)
+
+        self.speech_rate_label = ttk.Label(speech_rate_frame, text="1.0x", width=6)
+        self.speech_rate_label.pack(side=tk.LEFT, padx=(5, 0))
+
+        ttk.Label(speech_rate_frame, text="(0.5x - 2.0x)").pack(side=tk.LEFT, padx=(5, 0))
+
         # 保存配置按钮
-        ttk.Button(config_frame, text="保存配置", command=self.save_config_clicked).grid(row=3, column=1, sticky=tk.W, pady=(10, 0))
+        ttk.Button(config_frame, text="保存配置", command=self.save_config_clicked).grid(row=4, column=1, sticky=tk.W, pady=(10, 0))
 
         config_frame.columnconfigure(1, weight=1)
 
@@ -167,11 +189,17 @@ class TTSGui:
         self.log_text.see(tk.END)
         self.log_text.configure(state=tk.DISABLED)
 
+    def update_speech_rate_label(self, value=None):
+        """更新语速标签"""
+        rate = self.speech_rate_var.get()
+        self.speech_rate_label.configure(text=f"{rate:.1f}x")
+
     def save_config_clicked(self):
         """保存配置"""
         self.config["api_key"] = self.api_key_var.get().strip()
         self.config["model"] = self.model_var.get()
         self.config["voice_id"] = self.voice_var.get()
+        self.config["speech_rate"] = round(self.speech_rate_var.get(), 2)
         self.save_config()
 
         # 更新 dashscope 配置
@@ -214,13 +242,14 @@ class TTSGui:
 
             model = self.model_var.get()
             voice = self.voice_var.get()
+            speech_rate = round(self.speech_rate_var.get(), 2)
             output_file = OUTPUT_DIR / self.output_var.get()
 
-            self.log(f"开始合成: 模型={model}, 语音={voice}")
+            self.log(f"开始合成: 模型={model}, 语音={voice}, 语速={speech_rate}x")
             self.log(f"文本长度: {len(text)} 字符")
 
             # 创建合成器并调用
-            synthesizer = SpeechSynthesizer(model=model, voice=voice)
+            synthesizer = SpeechSynthesizer(model=model, voice=voice, speech_rate=speech_rate)
             audio_data = synthesizer.call(text)
 
             # 保存音频文件
