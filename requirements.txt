@@ -1,0 +1,2 @@
+# AI-TTS 依赖
+dashscope>=1.14.0

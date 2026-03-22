@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install:*)",
+      "Bash(start python:*)",
+      "Bash(pyinstaller --onefile --windowed --name \"AI-TTS\" tts_gui.py)",
+      "Bash(start:*)",
+      "Bash(cd:*)"
+    ]
+  }
+}

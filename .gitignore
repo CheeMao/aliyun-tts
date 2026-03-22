@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.spec
+
+# Build
+build/
+dist/
+
+# Config (may contain API key)
+config.json
+
+# Output
+output/
+
+# IDE
+.vscode/
+.idea/
