@@ -6,15 +6,23 @@
 
 - 🎙️ 多种语音模型支持（CosyVoice v1.5 - v3.5）
 - 🗣️ 丰富的内置音色（男声/女声/童声）
+- 🚀 语速调节（0.5x - 2.0x）
 - ⚙️ API Key、模型、语音ID 可视化配置
 - 📁 自动保存音频到本地
 - ▶️ 一键播放生成的音频
+- 🌍 跨平台支持（Windows/macOS/Linux）
 
 ## 安装使用
 
-### 方式一：直接运行 exe（Windows）
+### 方式一：下载可执行文件（推荐）
 
-下载 `dist/AI-TTS.exe`，双击运行即可。
+前往 [Releases](https://github.com/CheeMao/aliyun-tts/releases) 页面下载对应平台的文件：
+
+| 平台 | 文件 | 使用方式 |
+|------|------|----------|
+| Windows | AI-TTS-Windows.exe | 双击运行 |
+| macOS | AI-TTS-macOS.dmg | 挂载后拖到 Applications |
+| Linux | AI-TTS-Linux | 添加执行权限后运行 |
 
 ### 方式二：Python 源码运行
 
@@ -26,19 +34,6 @@ pip install dashscope
 python tts_gui.py
 ```
 
-### Mac / Linux 用户
-
-```bash
-# 安装依赖
-pip3 install dashscope pyinstaller
-
-# 运行
-python3 tts_gui.py
-
-# 如需打包为应用
-pyinstaller --onefile --windowed --name "AI-TTS" tts_gui.py
-```
-
 ## 配置说明
 
 1. 获取阿里云 API Key
@@ -47,7 +42,12 @@ pyinstaller --onefile --windowed --name "AI-TTS" tts_gui.py
 
 2. 在应用中填入 API Key，选择模型和语音ID
 
-3. 输入文本，点击"开始合成"
+3. 调节语速（可选）
+   - 范围：0.5x - 2.0x
+   - 1.0x 为默认语速
+   - 数值越大语速越快
+
+4. 输入文本，点击"开始合成"
 
 ## 支持的语音
 
