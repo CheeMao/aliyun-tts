@@ -61,30 +61,19 @@ jobs:
           brew install create-dmg
           create-dmg \
             --volname "AI-TTS" \
-            --volicon "dist/AI-TTS.app/Contents/Resources/icon.icns" \
             --window-pos 200 120 \
             --window-size 600 400 \
             --icon-size 100 \
             --icon "AI-TTS.app" 150 190 \
-            --hide-extension "AI-TTS.app" \
             --app-drop-link 450 190 \
             "dist/AI-TTS-macOS.dmg" \
-            "dist/AI-TTS.app" || true
-
-      - name: Fallback to zip if dmg fails
-        run: |
-          if [ ! -f dist/AI-TTS-macOS.dmg ]; then
-            cd dist
-            zip -r AI-TTS-macOS.zip AI-TTS.app
-          fi
+            "dist/AI-TTS.app"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: macOS
-          path: |
-            dist/AI-TTS-macOS.dmg
-            dist/AI-TTS-macOS.zip
+          path: dist/AI-TTS-macOS.dmg
 
   build-linux:
     runs-on: ubuntu-latest
